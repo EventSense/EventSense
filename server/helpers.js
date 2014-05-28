@@ -133,15 +133,13 @@ var scheduleTweet = function(time, tweet){
 
 var sentimentAnalysis = function(text){
  // returns sentiment score for one message
- console.log('sentiment!!!!', sentiment(text).score);
- return 666;
+ return sentiment(text).score;
 };
 
-var loveThreshold = 600;
-var hateThreshold = -600;
+var loveThreshold = 5;
+var hateThreshold = -5;
 var love = [];
 var hate = [];
-var compositeScore = 0;
 
 var analyzeTweets = function(tweets){
   // tweets is array with tweet objects
