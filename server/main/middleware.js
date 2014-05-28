@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = exports = {
   logError: function(err, req, res, next) {
     if (err) {

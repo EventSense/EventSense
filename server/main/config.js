@@ -1,5 +1,3 @@
-"use strict";
-
 var morgan     = require('morgan'),
     bodyParser = require('body-parser'),
     middle     = require('./middleware');

@@ -1,11 +1,8 @@
-"use strict";
-
 var express = require('express'),
     middle  = require('../main/middleware');
 
 var app = express();
 var nexmoRouter = express.Router();
-
 
 nexmoRouter.route('/nexmo')
 
@@ -18,4 +15,5 @@ nexmoRouter.route('/nexmo')
 });
 
 require('./config.js')(app, express, {nexmoRouter: nexmoRouter});
+
 module.exports = exports = app;
