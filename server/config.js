@@ -1,7 +1,7 @@
 var morgan     = require('morgan'),
     bodyParser = require('body-parser'),
     middle     = require('./middleware'),
-    heap       = require('heap');
+    Heap       = require('heap');
 
 module.exports = exports = function(app, express, routers) {
   app.set('port', process.env.PORT || 9000);
