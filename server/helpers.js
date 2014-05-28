@@ -14,7 +14,7 @@ var oauth = new oauth.OAuth(
 
 setInterval(function() {
   exports.getMentions();
-}, 15000);
+}, 30000);
 
 exports.getMentions = function(req, res, callback){
   callback = callback || analyzeTweets;
