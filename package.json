@@ -7,6 +7,7 @@
     "express": "*",
     "heap": "^0.2.3",
     "morgan": "*",
+    "oauth": "^0.9.12",
     "q": "*",
     "request": "^2.36.0",
     "twitter": "^0.2.9",

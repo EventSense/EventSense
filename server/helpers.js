@@ -1,4 +1,28 @@
 var request = require('request');
+var oauth = require('oauth');
+
+var oauth = new oauth.OAuth(
+  'https://api.twitter.com/oauth/request_token',
+  'https://api.twitter.com/oauth/access_token',
+  process.env.CONSUMER_KEY,
+  process.env.CONSUMER_SECRET,
+  '1.0A',
+  null,
+  'HMAC-SHA1'
+);
+
+exports.getMentions = function(req, res, callback){
+  callback = callback || analyzeTweets;
+  oauth.get(
+    'https://api.twitter.com/1.1/statuses/mentions_timeline.json?count=800',
+    process.env.ACCESS_TOKEN_KEY, //test user token
+    process.env.ACCESS_TOKEN_SECRET, //test user secret            
+    function (e, data, res){
+      if (e) return console.error(e);
+      callback(data);
+      res.send(200,'tweets obtained!')
+    });    
+}
 
 exports.sendMessage = function(message, number){
   number = number || process.env.TEST_PHONE;
@@ -95,13 +119,48 @@ var sentimentAnalysis = function(text){
  return 666;
 };
 
+var loveThreshold = 600;
+var hateThreshold = -600;
+var love = [];
+var hate = [];
+var compositeScore = 0;
+
 var analyzeTweets = function(tweets){
- // tweets is array with tweet objects
- // analyzeTweets iterates over all tweets, 
- // calling sentimentAnalysis on each,
- // then calculates average sentiment score
- return 666;
+  // tweets is array with tweet objects
+  // analyzeTweets iterates over all tweets, 
+  compositeScore = 0;
+  for (var i = 0; i < tweets.length; i++){
+    // calling sentimentAnalysis on each,
+    var score = sentimentAnalysis(tweets[i]);
+    if(score > loveThreshold){
+      // add to love
+      love.push(tweets[i]);
+      // retweet
+      retweet(tweets[i]);
+    } else if(score < hateThreshold){
+      // add to hate
+      hate.push(tweets[i]);
+      // text to organizer
+      exports.sendMessage(tweets[i].text);
+    }
+    compositeScore += score;
+  }
+  compositeScore /= i;
+  // then calculates average sentiment score
+  return compositeScore;
 };
+
+var retweet = function(tweet){
+  var retweetId = tweet.id_str;
+  oauth.get(
+    'https://api.twitter.com/1.1/statuses/retweet/' + retweetId + '.json',
+    process.env.ACCESS_TOKEN_KEY, //test user token
+    process.env.ACCESS_TOKEN_SECRET, //test user secret            
+    function (e, data, res){
+      if (e) return console.error(e);
+      res.send(200,'Retweeted!')
+    });    
+}
 
 var retrieveTweets = function(startTime, endTime){
  // retrieve all tweets between startTime and endTime

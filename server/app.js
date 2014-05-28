@@ -9,8 +9,19 @@ app.get('/', function(req, res, next) {
   res.send(200,'^-^');
 });
 
+// placeholder for testing deployment
+app.get('/', function(req, res, next) {
+  res.send(200, '^_^'); 
+});
+
+app.get('/twitter/mentions',function(req, res, next){
+  helpers.getMentions(req, res);
+})
+
 app.get('/nexmo', function(req, res, next){
-  helpers.callWit(req);
+  helpers.callWit(req,res, function(data){
+    helpers.sendMessage(data);
+  });
   res.send(200);
 });
 
