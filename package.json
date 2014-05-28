@@ -10,6 +10,7 @@
     "oauth": "^0.9.12",
     "q": "*",
     "request": "^2.36.0",
+    "sentiment": "^1.0.0-alpha",
     "twitter": "^0.2.9",
     "util": "^0.10.3"
   }

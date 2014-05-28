@@ -1,5 +1,6 @@
 var request = require('request');
 var oauth = require('oauth');
+var sentiment = require('sentiment');
 
 var oauth = new oauth.OAuth(
   'https://api.twitter.com/oauth/request_token',
@@ -25,24 +26,30 @@ exports.getMentions = function(req, res, callback){
 }
 
 exports.sendMessage = function(message, number){
+  console.log('sending message!')
   number = number || process.env.TEST_PHONE;
   var text = {
     api_key: process.env.NEXMO_KEY,
     api_secret: process.env.NEXMO_SECRET,
     from: process.env.NEXMO_PHONE,
     to: number,
-    text: message,
+    text: message
   };
   
   request.post('https://rest.nexmo.com/sms/json',{
     form: text
+  },function(err,data){
+    if(err) return console.error(err);
+    console.log('DATA!',data.body);
   });
 };
 
-exports.callWit = function(req){
+exports.callWit = function(req, res){
   var headers = {
     Authorization: 'Bearer ' + process.env.WITAI_KEY,
   };
+
+  console.log(req.query.text);
 
   var options = {
     url: 'https://api.wit.ai/message',
@@ -50,34 +57,43 @@ exports.callWit = function(req){
     form: {q: req.query.text, v: '20140528'}
   };
 
-  request.get(options, function(err, res, body){
+  request.get(options, function(err, dummyVariable, body){
     if(err) return console.error(err);
+    body = JSON.parse(body);
     var intent = body.outcome.intent;
+    console.log(intent);
     switch (intent) {
       case 'eventSummary':
-        var startTime, endTime;
-        if (outcome.entitites.datetime) {
-          if (Array.isArray(outcome.entitites.datetime)) {
-            startTime = outcome.entities.datetime[0].value.from;
-            endTime = outcome.entities.datetime[1].value.from;
-          } else {
-            startTime = outcome.entities.datetime[0].value.from;
-          }
-        }
-        getSummary(startTime, endTime);
+        // var startTime, endTime;
+        // if (body.outcome.entities.datetime) {
+        //   if (Array.isArray(body.outcome.entities.datetime)) {
+        //     startTime = body.outcome.entities.datetime[0].value.from;
+        //     endTime = body.outcome.entities.datetime[1].value.from;
+        //   } else {
+        //     startTime = body.outcome.entities.datetime[0].value.from;
+        //   }
+        // }
+        exports.getMentions(req, res, function(tweets) {
+          var score = analyzeTweets(tweets);
+          console.log(score);
+          exports.sendMessage('Your self-worth is: ' + score + ' ^ _ ^ ');
+        });
         break;
       case 'bestFeedback':
+      console.log('bestFeedback');
         findLove();
         break;
       case 'worstIssue':
+      console.log('worstIssue');
         findHate();
         break;
       case 'scheduleTweet':
+      console.log('scheduleTweet');
         var time;
-        if (outcome.entities.datetime) {
-          time = outcome.entitites.datetime.value.from;
+        if (body.outcome.entities.datetime) {
+          time = body.outcome.entities.datetime.value.from;
         }
-        var message = outcome.entitites.message_body.value;
+        var message = body.outcome.entities.message_body.value;
         scheduleTweet(time, message);
         break;
       default:
@@ -87,6 +103,7 @@ exports.callWit = function(req){
 };
 
 var getSummary = function(startTime, endTime){
+  retrieve
   var tweets = retrieveTweets(startTime, endTime);
   var compositeScore = analyzeTweets(tweets);
   exports.sendMessage('The average attendee rates this event at ' + compositeScore + '.');
@@ -116,6 +133,7 @@ var scheduleTweet = function(time, tweet){
 
 var sentimentAnalysis = function(text){
  // returns sentiment score for one message
+ console.log('sentiment!!!!', sentiment(text).score);
  return 666;
 };
 
@@ -132,7 +150,7 @@ var analyzeTweets = function(tweets){
   compositeScore = 0;
   for (var i = 0; i < tweets.length; i++){
     // calling sentimentAnalysis on each,
-    var score = sentimentAnalysis(tweets[i]);
+    var score = sentimentAnalysis(tweets[i].text);
     if(score > loveThreshold){
       // add to love
       love.push(tweets[i]);
@@ -142,7 +160,7 @@ var analyzeTweets = function(tweets){
       // add to hate
       hate.push(tweets[i]);
       // text to organizer
-      exports.sendMessage(tweets[i].text);
+      setTimeout(function(){exports.sendMessage(tweets[i].text)},1000*i);
     }
     compositeScore += score;
   }
@@ -166,16 +184,21 @@ var retweet = function(tweet){
     });
 }
 
-var retrieveTweets = function(startTime, endTime){
- // retrieve all tweets between startTime and endTime
- // default endTime is now
- // default startTime is 24 hours ago
- return 'tweets!';
+var retrieveTweets = function(req, res, callback){
+  callback = callback || analyzeTweets;
+  oauth.get(
+    'https://api.twitter.com/1.1/statuses/mentions_timeline.json?count=800',
+    process.env.ACCESS_TOKEN_KEY, //test user token
+    process.env.ACCESS_TOKEN_SECRET, //test user secret            
+    function (e, data, res){
+      if (e) return console.error(e);
+      callback(data);
+      // res.send(200,'tweets obtained!')
+    });    
 };
 
 exports.sendTweet = function(tweet){
  // post tweet...
- // exports.sendMessage(tweet, process.env.TEST_PHONE);
   oauth.post(
     'https://api.twitter.com/1.1/statuses/update.json',
     process.env.ACCESS_TOKEN_KEY, //test user token

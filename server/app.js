@@ -19,15 +19,13 @@ app.get('/twitter/mentions',function(req, res, next){
 })
 
 app.get('/nexmo', function(req, res, next){
-  helpers.callWit(req,res, function(data){
-    helpers.sendMessage(data);
-  });
+  helpers.callWit(req,res);
   res.send(200);
 });
 
 app.get('/twitter/sendTweet',function(req,res,next){
   helpers.sendTweet("I'm an automated tweet! #APIconSF #Automation #SuchIsThePowerOfJavascript");
-})
+});
 
 require('./config.js')(app, express);
 
