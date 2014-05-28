@@ -13,3 +13,21 @@ exports.sendMessage = function(message, number){
     form: text
   });
 };
+
+exports.callWit = function(req, res, callback){
+  var headers = {
+    Authorization: 'Bearer ' + process.env.WITAI,
+    Accept: 'application/vnd.wit.20140401'
+  };
+
+  var options = {
+    url: 'https://api.wit.ai/message',
+    headers: headers,
+    form: {q: req.query.text}
+  };
+
+  request.get(options, function(err, res, body){
+    if(err) return console.error(err);
+    callback(body);
+  });
+}
