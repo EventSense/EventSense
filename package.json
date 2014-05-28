@@ -7,6 +7,8 @@
     "express": "*",
     "morgan": "*",
     "q": "*",
-    "request": "^2.36.0"
+    "request": "^2.36.0",
+    "twitter": "^0.2.9",
+    "util": "^0.10.3"
   }
 }
