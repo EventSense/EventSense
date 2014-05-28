@@ -3,7 +3,6 @@ var express = require('express'),
     helpers = require('./helpers');
 
 var app = express();
-var nexmoRouter = express.Router();
 
 // placeholder for testing deployment
 app.get('/', function(req, res, next) {
@@ -11,6 +10,6 @@ app.get('/', function(req, res, next) {
   res.send(200, 'hello world :-)');
 });
 
-require('./config.js')(app, express, {nexmoRouter: nexmoRouter});
+require('./config.js')(app, express);
 
 module.exports = exports = app;

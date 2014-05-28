@@ -8,7 +8,6 @@ module.exports = exports = function(app, express, routers) {
   app.use(morgan('dev'));
   app.use(bodyParser());
   app.use(middle.cors);
-  app.use('/', routers.nexmoRouter);
   app.use(middle.logError);
   app.use(middle.handleError);
 };

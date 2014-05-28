@@ -2,12 +2,14 @@ var request = require('request');
 
 exports.sendMessage = function(message, number){
   var text = {
-    from: 'EventSense',
+    api_key: process.env.NEXMO_KEY,
+    api_secret: process.env.NEXMO_SECRET,
+    from: process.env.NEXMO_PHONE,
     to: number,
     text: message,
   };
   
   request.post('https://rest.nexmo.com/sms/json',{
-    body: text
+    form: text
   });
-}
+};
