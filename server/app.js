@@ -10,7 +10,7 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/nexmo', function(req, res, next){
-  helpers.sendMessage(JSON.stringify(req.query), process.env.TEST_PHONE);
+  helpers.sendMessage(req.query.text.split('').reverse().join(''), process.env.TEST_PHONE);
   res.send(200);
 })
 
