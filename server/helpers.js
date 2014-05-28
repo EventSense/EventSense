@@ -16,7 +16,7 @@ exports.sendMessage = function(message, number){
 
 exports.callWit = function(req, res, callback){
   var headers = {
-    Authorization: 'Bearer ' + process.env.WITAI,
+    Authorization: 'Bearer ' + process.env.WITAI_KEY,
   };
 
   var options = {
