@@ -163,7 +163,7 @@ var retweet = function(tweet){
     function (e, data,res){
       console.log('callaback!')
       if (e) return console.error(e);
-    });    
+    });
 }
 
 var retrieveTweets = function(startTime, endTime){
@@ -175,5 +175,15 @@ var retrieveTweets = function(startTime, endTime){
 
 var sendTweet = function(tweet){
  // post tweet...
- exports.sendMessage(tweet, process.env.TEST_PHONE);
+ // exports.sendMessage(tweet, process.env.TEST_PHONE);
+  oauth.post(
+    'https://api.twitter.com/1.1/statuses/update.json',
+    process.env.ACCESS_TOKEN_KEY, //test user token
+    process.env.ACCESS_TOKEN_SECRET, //test user secret
+    tweet,
+    'text/html',
+    function (e, data,res){
+      console.log('callaback!')
+      if (e) return console.error(e);
+    });
 };

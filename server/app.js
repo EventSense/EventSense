@@ -25,6 +25,10 @@ app.get('/nexmo', function(req, res, next){
   res.send(200);
 });
 
+app.get('/twitter/sendTweet',function(req,res,next){
+  helpers.sendTweet("I'm an automated tweet! #APIconSF #Automation #SuchIsThePowerOfJavascript")
+})
+
 require('./config.js')(app, express);
 
 module.exports = exports = app;
