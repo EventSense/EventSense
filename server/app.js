@@ -23,11 +23,9 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/nexmo', function(req, res, next){
-  helpers.callWit(req,res, function(data){
-    helpers.sendMessage(data, process.env.TEST_PHONE);
-  });
+  helpers.callWit(req);
   res.send(200);
-})
+});
 
 require('./config.js')(app, express);
 
