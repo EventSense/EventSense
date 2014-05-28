@@ -4,9 +4,7 @@
   "dependencies": {
     "express": "*",
     "q": "*",
-    "request": "^2.36.0"
-  },
-  "devDependencies": {
+    "request": "^2.36.0",
     "morgan": "*",
     "body-parser": "*"
   }
