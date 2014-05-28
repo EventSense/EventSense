@@ -6,7 +6,6 @@ var express = require('express'),
 var app = express();
 var nexmoRouter = express.Router();
 
-require('./config.js')(app, express, {nexmoRouter: nexmoRouter});
 
 nexmoRouter.route('/nexmo')
 
@@ -18,4 +17,5 @@ nexmoRouter.route('/nexmo')
   // handle nexmo req
 });
 
+require('./config.js')(app, express, {nexmoRouter: nexmoRouter});
 module.exports = exports = app;
