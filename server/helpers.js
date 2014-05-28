@@ -180,10 +180,9 @@ exports.sendTweet = function(tweet){
     'https://api.twitter.com/1.1/statuses/update.json',
     process.env.ACCESS_TOKEN_KEY, //test user token
     process.env.ACCESS_TOKEN_SECRET, //test user secret
-    tweet,
+    {status:tweet},
     'text/html',
     function (e, data,res){
-      console.log('callaback!')
       if (e) return console.error(e);
     });
 };
