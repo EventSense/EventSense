@@ -11,6 +11,7 @@ app.get('/', function(req, res, next) {
 
 app.get('/nexmo', function(req, res, next){
   helpers.sendMessage(JSON.stringify(req.query), process.env.TEST_PHONE);
+  res.send(200);
 })
 
 require('./config.js')(app, express);
