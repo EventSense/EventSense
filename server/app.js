@@ -5,7 +5,11 @@ var express = require('express'),
 var app = express();
 var nexmoRouter = express.Router();
 
-nexmo.initialize(process.env.NEXMO_KEY,process.env.NEXMO_SECRET, 'http', false);
+nexmo.initialize(process.env.NEXMO_KEY, process.env.NEXMO_SECRET, 'http', false);
+// placeholder for testing deployment
+app.get('/', function(req, res, next) {
+  res.send(200, 'hello world :-)');
+});
 
 nexmoRouter.route('/nexmo')
 
@@ -14,11 +18,7 @@ nexmoRouter.route('/nexmo')
 })
 
 .post(function(req, res, next) {
-  nexmo.sendTextMessage(process.env.NEXMO_PHONE, process.env.TEST_PHONE,"hello world");
-});
-
-app.get('/', function(req, res, next) {
-  res.send(200, 'hello world :-)');
+  nexmo.sendTextMessage(process.env.NEXMO_PHONE, process.env.TEST_PHONE, "hello world");
 });
 
 require('./config.js')(app, express, {nexmoRouter: nexmoRouter});
