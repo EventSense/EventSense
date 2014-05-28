@@ -5,6 +5,7 @@ var express = require('express'),
 var app = express();
 var nexmoRouter = express.Router();
 
+nexmo.initialize(process.env.NEXMO_KEY, process.env.NEXMO_SECRET, 'http', false);
 // placeholder for testing deployment
 app.get('/', function(req, res, next) {
   helpers.sendMessage('Hello, world', process.env.TEST_PHONE);
