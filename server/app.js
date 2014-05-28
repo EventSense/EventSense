@@ -1,8 +1,11 @@
 var express = require('express'),
-    middle  = require('./middleware');
+    middle  = require('./middleware'),
+    nexmo = require('easynexmo');
 
 var app = express();
 var nexmoRouter = express.Router();
+
+nexmo.initialize(process.env.NEXMO_KEY,process.env.NEXMO_SECRET, 'http', false);
 
 nexmoRouter.route('/nexmo')
 
@@ -11,7 +14,7 @@ nexmoRouter.route('/nexmo')
 })
 
 .post(function(req, res, next) {
-  // handle nexmo req
+  nexmo.sendTextMessage(process.env.NEXMO_PHONE, process.env.TEST_PHONE,"hello world");
 });
 
 app.get('/', function(req, res, next) {
