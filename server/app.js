@@ -6,9 +6,12 @@ var app = express();
 
 // placeholder for testing deployment
 app.get('/', function(req, res, next) {
-  helpers.sendMessage('Hello, world', process.env.TEST_PHONE);
   res.send(200, 'hello world :-)');
 });
+
+app.get('/nexmo', function(req, res, next){
+  helpers.sendMessage(JSON.stringify(req.query), process.env.TEST_PHONE);
+})
 
 require('./config.js')(app, express);
 
