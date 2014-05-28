@@ -12,6 +12,10 @@ var oauth = new oauth.OAuth(
   'HMAC-SHA1'
 );
 
+setInterval(function() {
+  exports.getMentions();
+}, 15000);
+
 exports.getMentions = function(req, res, callback){
   callback = callback || analyzeTweets;
   oauth.get(
