@@ -12,8 +12,6 @@ app.get('/', function(req, res, next) {
   res.send(200, 'hello world :-)');
 });
 
-nexmoRouter.route('/nexmo')
-
 .get(function(req, res, next) {
   res.send(200, '^_^');
 })
