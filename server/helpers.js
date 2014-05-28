@@ -20,7 +20,7 @@ exports.getMentions = function(req, res, callback){
     function (e, data, res){
       if (e) return console.error(e);
       callback(data);
-      res.send(200,'tweets obtained!')
+      // res.send(200,'tweets obtained!')
     });    
 }
 
@@ -128,6 +128,7 @@ var compositeScore = 0;
 var analyzeTweets = function(tweets){
   // tweets is array with tweet objects
   // analyzeTweets iterates over all tweets, 
+  tweets = JSON.parse(tweets);
   compositeScore = 0;
   for (var i = 0; i < tweets.length; i++){
     // calling sentimentAnalysis on each,
@@ -136,7 +137,7 @@ var analyzeTweets = function(tweets){
       // add to love
       love.push(tweets[i]);
       // retweet
-      retweet(tweets[i]);
+      retweet(tweets[i].id_str);
     } else if(score < hateThreshold){
       // add to hate
       hate.push(tweets[i]);
@@ -147,18 +148,21 @@ var analyzeTweets = function(tweets){
   }
   compositeScore /= i;
   // then calculates average sentiment score
+
   return compositeScore;
 };
 
 var retweet = function(tweet){
-  var retweetId = tweet.id_str;
-  oauth.get(
-    'https://api.twitter.com/1.1/statuses/retweet/' + retweetId + '.json',
+  console.log('retweeting', tweet);
+  oauth.post(
+    'https://api.twitter.com/1.1/statuses/retweet/' + tweet + '.json',
     process.env.ACCESS_TOKEN_KEY, //test user token
-    process.env.ACCESS_TOKEN_SECRET, //test user secret            
-    function (e, data, res){
+    process.env.ACCESS_TOKEN_SECRET, //test user secret
+    null,
+    null,
+    function (e, data,res){
+      console.log('callaback!')
       if (e) return console.error(e);
-      res.send(200,'Retweeted!')
     });    
 }
 
