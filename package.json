@@ -1,0 +1,13 @@
+{
+  "name": "package",
+  "version": "0.0.0",
+  "dependencies": {
+    "express": "*",
+    "q": "*",
+    "request": "^2.36.0"
+  },
+  "devDependencies": {
+    "morgan": "*",
+    "body-parser": "*"
+  }
+}
