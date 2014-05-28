@@ -5,6 +5,7 @@
     "body-parser": "*",
     "easynexmo": "^0.3.2",
     "express": "*",
+    "heap": "^0.2.3",
     "morgan": "*",
     "q": "*",
     "request": "^2.36.0",
