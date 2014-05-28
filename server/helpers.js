@@ -126,7 +126,7 @@ var scheduleTweet = function(time, tweet){
  var now = new Date();
  var wait = tweetAt - now;
  setTimeout(function(){
-   sendTweet(tweet);
+   exports.sendTweet(tweet);
  }, wait);
 };
 
