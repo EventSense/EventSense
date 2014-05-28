@@ -17,13 +17,12 @@ exports.sendMessage = function(message, number){
 exports.callWit = function(req, res, callback){
   var headers = {
     Authorization: 'Bearer ' + process.env.WITAI,
-    Accept: 'application/vnd.wit.20140401'
   };
 
   var options = {
     url: 'https://api.wit.ai/message',
     headers: headers,
-    form: {q: req.query.text}
+    form: {q: req.query.text, v: '20140528'}
   };
 
   request.get(options, function(err, res, body){
