@@ -173,7 +173,7 @@ var retrieveTweets = function(startTime, endTime){
  return 'tweets!';
 };
 
-var sendTweet = function(tweet){
+exports.sendTweet = function(tweet){
  // post tweet...
  // exports.sendMessage(tweet, process.env.TEST_PHONE);
   oauth.post(
