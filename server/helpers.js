@@ -61,7 +61,7 @@ exports.callWit = function(req, res){
     form: {q: req.query.text, v: '20140528'}
   };
 
-  request.get(options, function(err, dummyVariable, body){
+  request.get(options, function(err, res, body){
     if(err) return console.error(err);
     body = JSON.parse(body);
     var intent = body.outcome.intent;
@@ -98,7 +98,7 @@ exports.callWit = function(req, res){
           time = body.outcome.entities.datetime.value.from;
         }
         var message = body.outcome.entities.message_body.value;
-        scheduleTweet(time, message);
+        scheduleTweet(time, message, res);
         break;
       default:
         console.log('oops');
@@ -122,7 +122,7 @@ var findHate = function(){
 };
 
 
-var scheduleTweet = function(time, tweet){
+var scheduleTweet = function(time, tweet,res){
  if(!time){
    time = new Date();
  }
@@ -130,7 +130,7 @@ var scheduleTweet = function(time, tweet){
  var now = new Date();
  var wait = tweetAt - now;
  setTimeout(function(){
-   exports.sendTweet(tweet);
+   exports.sendTweet(tweet,res);
  }, wait);
 };
 
@@ -201,7 +201,7 @@ var retrieveTweets = function(req, res, callback){
     });    
 };
 
-exports.sendTweet = function(tweet){
+exports.sendTweet = function(tweet, response){
  // post tweet...
   oauth.post(
     'https://api.twitter.com/1.1/statuses/update.json',
@@ -210,6 +210,7 @@ exports.sendTweet = function(tweet){
     {status:tweet},
     'text/html',
     function (e, data,res){
-      if (e) return console.error(e);
+      if (e) res.send(e,response);
+      res.send(200);
     });
 };
