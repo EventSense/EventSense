@@ -145,6 +145,8 @@ var hateThreshold = -0.1;
 var love = [];
 var hate = [];
 
+// var throttle = function
+
 var analyzeTweets = function(tweets){
   // tweets is array with tweet objects
   // analyzeTweets iterates over all tweets, 
@@ -162,7 +164,7 @@ var analyzeTweets = function(tweets){
       // add to hate
       hate.push(tweets[i]);
       // text to organizer
-      setTimeout(function(){exports.sendMessage(tweets[i].text)},1000*i);
+      setTimeout(function(){exports.sendMessage(tweets[i].text)},Math.max(1000, 1000*i/10));
     }
     compositeScore += score;
   }
