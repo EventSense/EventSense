@@ -140,8 +140,8 @@ var sentimentAnalysis = function(text){
  return sentiment(text).score;
 };
 
-var loveThreshold = 5;
-var hateThreshold = -5;
+var loveThreshold = 0;
+var hateThreshold = -0.1;
 var love = [];
 var hate = [];
 
