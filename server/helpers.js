@@ -20,8 +20,8 @@ exports.getMentions = function(req, res, callback){
   callback = callback || analyzeTweets;
   oauth.get(
     'https://api.twitter.com/1.1/statuses/mentions_timeline.json?count=800',
-    process.env.ACCESS_TOKEN_KEY, //test user token
-    process.env.ACCESS_TOKEN_SECRET, //test user secret            
+    process.env.ACCESS_TOKEN_KEY, 
+    process.env.ACCESS_TOKEN_SECRET,             
     function (e, data, res){
       if (e) return console.error(e);
       callback(data);
@@ -68,15 +68,6 @@ exports.callWit = function(req, res){
     console.log(intent);
     switch (intent) {
       case 'eventSummary':
-        // var startTime, endTime;
-        // if (body.outcome.entities.datetime) {
-        //   if (Array.isArray(body.outcome.entities.datetime)) {
-        //     startTime = body.outcome.entities.datetime[0].value.from;
-        //     endTime = body.outcome.entities.datetime[1].value.from;
-        //   } else {
-        //     startTime = body.outcome.entities.datetime[0].value.from;
-        //   }
-        // }
         exports.getMentions(req, res, function(tweets) {
           var score = analyzeTweets(tweets);
           console.log(score);

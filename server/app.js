@@ -6,11 +6,6 @@ var app = express();
 
 // placeholder for testing deployment
 app.get('/', function(req, res, next) {
-  res.send(200,'^-^');
-});
-
-// placeholder for testing deployment
-app.get('/', function(req, res, next) {
   res.send(200, '^_^'); 
 });
 
