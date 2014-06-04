@@ -28,6 +28,7 @@ var stream = T.stream('user', {track: 'APIRXR'});
 
 // Watch Twitter stream
 stream.on('tweet', function(tweet){
+  console.log(tweet.text);
   // Get tweet sentiment score
   var tweetScore = sentiment(tweet.text).score;
   
@@ -39,16 +40,22 @@ stream.on('tweet', function(tweet){
   // If tweet score exceeds thresholds, take action
   if(tweetScore > thresholds.high){
     retweet(tweet);
+    console.log('retweeted');
   } else if(tweetScore < thresholds.low){
-    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!')
+    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!');
+    console.log('posted')
   }
-
+  console.log('calling Wit')
   // Call Wit.AI to determine if the tweet should be responded to
   callWit(tweet);
 });
 
 function retweet(tweet){
-  T.post('statuses/retweet/' + tweet.id);
+  console.log(tweet.id);
+  T.post('statuses/retweet', {id: tweet.id}, function(err, data, res) {
+    if (err) return console.error(err);
+    console.log('RTd!', data);
+  });
 }
 
 function postTweet(message){
@@ -77,7 +84,7 @@ function callWit(tweet){
     body = JSON.parse(body);
     var intent = body.outcome.intent;
     if(intent === 'eventSummary'){
-      twitter.postTweet('@' + tweet.user.screen_name + ' Current average sentiment score is ' + scores.compositeScore + '.');
+      postTweet('@' + tweet.user.screen_name + ' Current average sentiment score is ' + scores.compositeScore + '.');
     }
   });
 };
