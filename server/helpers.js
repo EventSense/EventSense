@@ -1,207 +1,83 @@
 var request = require('request');
-var oauth = require('oauth');
+var Twitter = require('twit');
 var sentiment = require('sentiment');
 
-var oauth = new oauth.OAuth(
-  'https://api.twitter.com/oauth/request_token',
-  'https://api.twitter.com/oauth/access_token',
-  process.env.CONSUMER_KEY,
-  process.env.CONSUMER_SECRET,
-  '1.0A',
-  null,
-  'HMAC-SHA1'
-);
+// Set up twitter authentication
+var T = new Twitter({
+    consumer_key:         process.env.CONSUMER_KEY,
+    consumer_secret:      process.env.CONSUMER_SECRET, 
+    access_token:         process.env.ACCESS_TOKEN_KEY,
+    access_token_secret:  process.env.ACCESS_TOKEN_SECRET
+});
 
-setInterval(function() {
-  exports.getMentions();
-}, 30000);
-
-exports.getMentions = function(req, res, callback){
-  callback = callback || analyzeTweets;
-  oauth.get(
-    'https://api.twitter.com/1.1/statuses/mentions_timeline.json?count=800',
-    process.env.ACCESS_TOKEN_KEY, 
-    process.env.ACCESS_TOKEN_SECRET,             
-    function (e, data, res){
-      if (e) return console.error(e);
-      callback(data);
-      // res.send(200,'tweets obtained!')
-    });    
+// Set options
+var thresholds = {
+  high: 5,
+  low: -3
 }
 
-exports.sendMessage = function(message, number){
-  console.log('sending message!')
-  number = number || process.env.TEST_PHONE;
-  var text = {
-    api_key: process.env.NEXMO_KEY,
-    api_secret: process.env.NEXMO_SECRET,
-    from: process.env.NEXMO_PHONE,
-    to: number,
-    text: message
-  };
-  
-  request.post('https://rest.nexmo.com/sms/json',{
-    form: text
-  },function(err,data){
-    if(err) return console.error(err);
-    console.log('DATA!',data.body);
-  });
-};
+// Track relevant data
+var scores = {
+  totalScore: 0,
+  compositeScore: 0,
+  count: 0
+}
 
-exports.callWit = function(req, res){
+// Select stream
+var stream = T.stream('user', {track: 'APIRXR'});
+
+// Watch Twitter stream
+stream.on('tweet', function(tweet){
+  // Get tweet sentiment score
+  var tweetScore = sentiment(tweet.text).score;
+  
+  // Average the tweet score into sentiment compositeScore
+  scores.count++;
+  scores.totalScore += tweetScore;
+  scores.compositeScore = scores.totalScore / scores.count;
+
+  // If tweet score exceeds thresholds, take action
+  if(tweetScore > thresholds.high){
+    retweet(tweet);
+  } else if(tweetScore < thresholds.low){
+    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!')
+  }
+
+  // Call Wit.AI to determine if the tweet should be responded to
+  callWit(tweet);
+});
+
+function retweet(tweet){
+  T.post('statuses/retweet/' + tweet.id);
+}
+
+function postTweet(message){
+  T.post('statuses/update', {status: message}, function(err, data, res){
+    if(err) return console.error(err);
+    console.log('Tweet sent!', data);
+  })
+}
+
+function callWit(tweet){
+  // Wit authentication
   var headers = {
     Authorization: 'Bearer ' + process.env.WITAI_KEY,
   };
 
-  console.log(req.query.text);
-
+  // Set WitAI http request headers
   var options = {
     url: 'https://api.wit.ai/message',
     headers: headers,
-    form: {q: req.query.text, v: '20140528'}
+    form: {q: tweet.text, v: '20140528'}
   };
 
-  request.get(options, function(err, res, body){
+  // Send http request to Wit.AI to process for intent
+  request.get(options, function(err, null, body){
     if(err) return console.error(err);
     body = JSON.parse(body);
     var intent = body.outcome.intent;
-    console.log(intent);
-    switch (intent) {
-      case 'eventSummary':
-        exports.getMentions(req, res, function(tweets) {
-          var score = analyzeTweets(tweets);
-          console.log(score);
-          exports.sendMessage('Your self-worth is: ' + score + ' ^ _ ^ ');
-        });
-        break;
-      case 'bestFeedback':
-      console.log('bestFeedback');
-        findLove();
-        break;
-      case 'worstIssue':
-      console.log('worstIssue');
-        findHate();
-        break;
-      case 'scheduleTweet':
-      console.log('scheduleTweet');
-        var time;
-        if (body.outcome.entities.datetime) {
-          time = body.outcome.entities.datetime.value.from;
-        }
-        var message = body.outcome.entities.message_body.value;
-        scheduleTweet(time, message, res);
-        break;
-      default:
-        console.log('oops');
+    if(intent === 'eventSummary'){
+      twitter.postTweet('@' + tweet.user.screen_name + ' Current average sentiment score is ' + scores.compositeScore + '.');
     }
   });
-};
-
-var getSummary = function(startTime, endTime){
-  retrieve
-  var tweets = retrieveTweets(startTime, endTime);
-  var compositeScore = analyzeTweets(tweets);
-  exports.sendMessage('The average attendee rates this event at ' + compositeScore + '.');
-};
-
-var findLove = function(){
- exports.sendMessage(app.get('love').pop().tweet, process.env.TEST_PHONE);
-};
-
-var findHate = function(){
- exports.sendMessage(app.get('hate').pop().tweet, process.env.TEST_PHONE);
-};
-
-
-var scheduleTweet = function(time, tweet,res){
- if(!time){
-   time = new Date();
- }
- var tweetAt = new Date(time);
- var now = new Date();
- var wait = tweetAt - now;
- setTimeout(function(){
-   exports.sendTweet(tweet,res);
- }, wait);
-};
-
-
-var sentimentAnalysis = function(text){
- // returns sentiment score for one message
- return sentiment(text).score;
-};
-
-var loveThreshold = 0;
-var hateThreshold = -0.1;
-var love = [];
-var hate = [];
-
-// var throttle = function
-
-var analyzeTweets = function(tweets){
-  // tweets is array with tweet objects
-  // analyzeTweets iterates over all tweets, 
-  tweets = JSON.parse(tweets);
-  compositeScore = 0;
-  for (var i = 0; i < tweets.length; i++){
-    // calling sentimentAnalysis on each,
-    var score = sentimentAnalysis(tweets[i].text);
-    if(score > loveThreshold){
-      // add to love
-      love.push(tweets[i]);
-      // retweet
-      retweet(tweets[i].id_str);
-    } else if(score < hateThreshold){
-      // add to hate
-      hate.push(tweets[i]);
-      // text to organizer
-      setTimeout(function(){exports.sendMessage(tweets[i].text)},Math.max(1000, 1000*i/10));
-    }
-    compositeScore += score;
-  }
-  compositeScore /= i;
-  // then calculates average sentiment score
-
-  return compositeScore;
-};
-
-var retweet = function(tweet){
-  console.log('retweeting', tweet);
-  oauth.post(
-    'https://api.twitter.com/1.1/statuses/retweet/' + tweet + '.json',
-    process.env.ACCESS_TOKEN_KEY, //test user token
-    process.env.ACCESS_TOKEN_SECRET, //test user secret
-    null,
-    null,
-    function (e, data,res){
-      console.log('callaback!')
-      if (e) return console.error(e);
-    });
-}
-
-var retrieveTweets = function(req, res, callback){
-  callback = callback || analyzeTweets;
-  oauth.get(
-    'https://api.twitter.com/1.1/statuses/mentions_timeline.json?count=800',
-    process.env.ACCESS_TOKEN_KEY, //test user token
-    process.env.ACCESS_TOKEN_SECRET, //test user secret            
-    function (e, data, res){
-      if (e) return console.error(e);
-      callback(data);
-      // res.send(200,'tweets obtained!')
-    });    
-};
-
-exports.sendTweet = function(tweet, response){
- // post tweet...
-  oauth.post(
-    'https://api.twitter.com/1.1/statuses/update.json',
-    process.env.ACCESS_TOKEN_KEY, //test user token
-    process.env.ACCESS_TOKEN_SECRET, //test user secret
-    {status:tweet},
-    'text/html',
-    function (e, data,res){
-      if (e) res.send(e,response);
-      res.send(200);
-    });
 };

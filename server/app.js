@@ -9,17 +9,9 @@ app.get('/', function(req, res, next) {
   res.send(200, '^_^'); 
 });
 
-app.get('/twitter/mentions',function(req, res, next){
-  helpers.getMentions(req, res);
-})
-
-app.get('/nexmo', function(req, res, next){
-  helpers.callWit(req,res);
-  res.send(200);
-});
-
+// eventsense.azurewebsites.net/twitter/sendTweet
 app.get('/twitter/sendTweet',function(req,res,next){
-  helpers.sendTweet("I'm an automated tweet! #APIconSF #Automation #SuchIsThePowerOfJavascript");
+  helpers.sendTweet("I'm an automated easter egg! #SuchIsThePowerOfJavascript @HackReactor @drewcuth1 @ackrause @nickolaswei @ovedpathak #AbusingTechnology");
 });
 
 require('./config.js')(app, express);
