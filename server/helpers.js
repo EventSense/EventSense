@@ -72,7 +72,7 @@ function callWit(tweet){
   };
 
   // Send http request to Wit.AI to process for intent
-  request.get(options, function(err, null, body){
+  request.get(options, function(err, dummyVariable, body){
     if(err) return console.error(err);
     body = JSON.parse(body);
     var intent = body.outcome.intent;
