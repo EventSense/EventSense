@@ -23,6 +23,8 @@ var scores = {
   count: 0
 }
 
+
+
 // Select stream
 var stream = T.stream('user', {track: 'APIRXR'});
 
@@ -42,7 +44,8 @@ stream.on('tweet', function(tweet){
     retweet(tweet);
     console.log('retweeted');
   } else if(tweetScore < thresholds.low){
-    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!');
+    console.log('tweetID:',tweet.id);
+    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!!', tweet.id_str);
     console.log('posted')
   }
   console.log('calling Wit')
@@ -58,10 +61,10 @@ function retweet(tweet){
   });
 }
 
-function postTweet(message){
-  T.post('statuses/update', {status: message}, function(err, data, res){
+function postTweet(message, tweetId){
+  T.post('statuses/update', {status: message, in_reply_to_status_id_str: tweetId, in_reply_to_status_id: tweetId}, function(err, data, res){
     if(err) return console.error(err);
-    console.log('Tweet sent!', data);
+    console.log('Tweet sent!');
   })
 }
 
@@ -84,7 +87,8 @@ function callWit(tweet){
     body = JSON.parse(body);
     var intent = body.outcome.intent;
     if(intent === 'eventSummary'){
-      postTweet('@' + tweet.user.screen_name + ' Current average sentiment score is ' + scores.compositeScore + '.');
+      console.log('Wit tweetID', tweet.id);
+      postTweet('@' + tweet.user.screen_name + ' Current average sentiment score is ' + scores.compositeScore + '.', tweet.id_str);
     }
   });
 };
