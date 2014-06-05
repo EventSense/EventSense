@@ -51,8 +51,8 @@ stream.on('tweet', function(tweet){
 });
 
 function retweet(tweet){
-  console.log(tweet.id);
-  T.post('statuses/retweet', {id: tweet.id}, function(err, data, res) {
+  console.log('tweet');
+  T.post('statuses/retweet/' + tweet.id_str, function(err, data, res) {
     if (err) return console.error(err);
     console.log('RTd!', data);
   });
