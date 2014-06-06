@@ -23,8 +23,6 @@ var scores = {
   count: 0
 }
 
-
-
 // Select stream
 var stream = T.stream('user', {track: 'APIRXR'});
 
@@ -42,7 +40,7 @@ stream.on('tweet', function(tweet){
   if(tweetScore > thresholds.high){
     retweet(tweet);
   } else if(tweetScore < thresholds.low){
-    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!!', tweet.id_str);
+    postTweet('@' + tweet.user.screen_name + ' ' + randomComback(), tweet.id_str);
   }
   // Call Wit.AI to determine if the tweet should be responded to
   callWit(tweet);
@@ -83,3 +81,22 @@ function callWit(tweet){
     }
   });
 };
+
+// Keep a few witty comebacks on hand, just in case...
+var comebacks = [
+  'That wasn\'t very nice!',
+  'Your mother was a hamster and your father smelt of elderberries',
+  'Methink\'st thou art a general offence and every man should beat thee',
+  'Thou mammering milk-livered bum-bailey!',
+  'I find the ass in compound with the major part of your syllables',
+  'What a drunken knave was the sea to cast thee in our way!',
+  'Come, come, you talk greasily; your lips grow foul.',
+  'Go ahead, make my day.',
+  'May the Force be with you',
+  'Frankly, my dear, I don\'t give a damn.'
+];
+
+function randomComeback(){
+  var random = Math.floor(Math.random() * comebacks.length)
+  return comebacks[random];
+}
