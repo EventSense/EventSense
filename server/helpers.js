@@ -100,3 +100,5 @@ function randomComeback(){
   var random = Math.floor(Math.random() * comebacks.length)
   return comebacks[random];
 }
+
+module.exports = {postTweet: postTweet};
