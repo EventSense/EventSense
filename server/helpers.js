@@ -12,8 +12,8 @@ var T = new Twitter({
 
 // Set options
 var thresholds = {
-  high: 5,
-  low: -3
+  high: 4,
+  low: -1
 }
 
 // Track relevant data
